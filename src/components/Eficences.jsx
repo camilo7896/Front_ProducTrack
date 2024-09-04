@@ -85,10 +85,10 @@ export default function Eficences() {
         <div>
           <CardPicadoComponent/>
 
-          <Card className="mx-auto max-w-md mt-4">
+          {/* <Card className="mx-auto max-w-md mt-4">
             <p className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">Total Horas Trabajadas </p>
             <p className="text-tremor-metric text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold">{totalHours}</p>
-          </Card>
+          </Card> */}
         </div>
 
         <div className="mx-auto max-w-full mt-4">
@@ -144,6 +144,7 @@ export default function Eficences() {
                   <th>H.Incial</th>
                   <th>H.Final</th>
                   <th>H.Trabajadas</th>
+                  <th>Observaciones</th>
                   <th>H.Asignada</th>
                   <th>Standar</th>
                   <th>Meta/horas</th>
@@ -158,7 +159,7 @@ export default function Eficences() {
                     const hoursWorked = finalHours - initialHours;
                     const registroStand = user.registro_standard || 0;
                     const horasAsignadas = user.hora_asignadaRegistrador || 0;
-
+                    const observciones = user.observaciones || [];
                     const registroStandDecimal = registroStand / 100;
                     const efficiencyValue = (hoursWorked - (registroStandDecimal * horasAsignadas)).toFixed(2);
 
@@ -171,6 +172,7 @@ export default function Eficences() {
                         <td>{initialHours}</td>
                         <td>{finalHours}</td>
                         <td>{hoursWorked}</td>
+                        <td>{observciones}</td>
                         <td>{horasAsignadas}</td>
                         <td>{registroStand}</td>
                         <td>{meta} %</td>
