@@ -23,7 +23,7 @@ const UpdateModal = ({ register, setSelectedRegister }) => {
 
     try {
       const response = await axios.patch(
-        `http://192.168.0.19:3000/api/horometro-all/${register.id_registro}`,
+        `http://localhost:3000/api/horometro-all/${register.id_registro}`,
         formData
       );
       console.log('Registro actualizado:', response.data);

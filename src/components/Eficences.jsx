@@ -6,7 +6,7 @@ import { Button } from '@tremor/react';
 import CardPicadoComponent from './CardPicadoComponent';
 
 export default function Eficences() {
-  const { allRegisterData, searchTermUser, setSearchTermUser, searchTermMachine, setSearchTermMachine, startDate,  setTotalHours, setStartDate, endDate, setEndDate, setTotalStandard, setEfficiency, setTotalEfficiency } = useGlobalContext();
+  const { allRegisterData, searchTermUser, setSearchTermUser, searchTermMachine, setSearchTermMachine, startDate, setTotalHours, setStartDate, endDate, setEndDate, setTotalStandard, setEfficiency, setTotalEfficiency } = useGlobalContext();
 
   const [meta, setMeta] = useState(0);
 
@@ -83,11 +83,6 @@ export default function Eficences() {
       <div className='flex justify-around flex-wrap'>
         <div>
           <CardPicadoComponent/>
-
-          {/* <Card className="mx-auto max-w-md mt-4">
-            <p className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">Total Horas Trabajadas </p>
-            <p className="text-tremor-metric text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold">{totalHours}</p>
-          </Card> */}
         </div>
 
         <div className="mx-auto max-w-full mt-4">
@@ -155,7 +150,7 @@ export default function Eficences() {
                   filteredData.map((user, index) => {
                     const initialHours = user.horometro_inicial || 0;
                     const finalHours = user.horometro_final || 0;
-                    const hoursWorked = finalHours - initialHours;
+                    const hoursWorked = (finalHours - initialHours).toFixed(2); // Redondeado a 2 decimales
                     const registroStand = user.registro_standard || 0;
                     const horasAsignadas = user.hora_asignadaRegistrador || 0;
                     const observciones = user.observaciones || [];
@@ -170,7 +165,7 @@ export default function Eficences() {
                         <td>{user.registro_referencia}</td>
                         <td>{initialHours}</td>
                         <td>{finalHours}</td>
-                        <td>{hoursWorked}</td>
+                        <td>{hoursWorked}</td> {/* Redondeado a 2 decimales */}
                         <td>{observciones}</td>
                         <td>{horasAsignadas}</td>
                         <td>{registroStand}</td>
