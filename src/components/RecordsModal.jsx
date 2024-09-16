@@ -1,89 +1,144 @@
-/* eslint-disable react/prop-types */
-import { useState } from 'react';
-import { useGlobalContext } from '../context/UserContext';
+import { useContext, useEffect, useState } from 'react';
+import CardPicadoComponent from './CardPicadoComponent';
+import { GlobalContext } from '../context/UserContext';
+import { Button } from '@tremor/react';
+import { RiRefreshLine } from '@remixicon/react';
 
-const RecordsModal = ({ onClose }) => {
-  const { allRegisterData } = useGlobalContext();
-  const [searchTerm, setSearchTerm] = useState('');
+const RecordsModal = () => {
+  const { data } = useContext(GlobalContext); // Asumiendo que tienes tu data en el GlobalContext
+  const [filteredData, setFilteredData] = useState([]);
+  const [totalHours, setTotalHours] = useState(0);
+  const [totalStandard, setTotalStandard] = useState(0);
+  const [totalEfficiency, setTotalEfficiency] = useState(0);
+  const [efficiency, setEfficiency] = useState(0);
+  const [meta] = useState(0.1); // Asignar algún valor de referencia si es necesario
 
-  // Filtrar registros por ID de usuario
-  const filteredRecords = allRegisterData.filter(record =>
-    record.id_usuarioRegistrador.toString().includes(searchTerm)
-  );
+  useEffect(() => {
+    // Filtrar datos para obtener sólo los registros que necesitas (esto dependerá de tus filtros)
+    setFilteredData(data);
+  }, [data]);
 
-  // Manejar el cambio en el campo de búsqueda
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+  // Calcular el total de horas trabajadas y otros valores
+  useEffect(() => {
+    let totalHours = 0;
+    let totalStandard = 0;
+    let totalEfficiency = 0;
+
+    filteredData.forEach(user => {
+      const initialHours = user.horometro_inicial || 0;
+      const finalHours = user.horometro_final || 0;
+      const hoursWorked = finalHours - initialHours;
+
+      totalHours += hoursWorked;
+
+      if (user.registro_standard) {
+        totalStandard += user.registro_standard;
+      }
+
+      const horasAsignadas = user.hora_asignadaRegistrador || 0;
+      const registroStandDecimal = user.registro_standard / 100;
+      const efficiencyValue = (hoursWorked - (registroStandDecimal * horasAsignadas)).toFixed(2);
+      totalEfficiency += parseFloat(efficiencyValue);
+    });
+
+    setTotalHours(totalHours.toFixed(2)); // Redondear a 2 decimales
+    setTotalStandard(totalStandard);
+    setTotalEfficiency(totalEfficiency.toFixed(2));
+
+    const efficiencyValue = totalStandard > 0 ? (totalHours / (totalStandard / 100)) * 100 : 0;
+    setEfficiency(efficiencyValue.toFixed(2));
+  }, [filteredData]);
+
+  // Función para volver atrás (según sea necesario)
+  const handleGoBack = () => {
+    // Lógica para manejar el botón de regreso
+  };
+
+  // Formateo de fecha
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date;
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="modal-overlay absolute inset-0 bg-gray-900 opacity-50" onClick={onClose}></div>
-      <div className="modal-container bg-white w-11/12 md:max-w-2xl mx-auto rounded shadow-lg z-50 overflow-hidden">
-        <div className="modal-content py-4 text-left px-6">
-          <div className="flex justify-between items-center pb-3">
-            <p className="text-2xl font-bold">Historial de Registros</p>
-            <button className="modal-close cursor-pointer z-50" onClick={onClose}>
-              <svg className="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
-                <path d="M14.53 3.53a.75.75 0 00-1.06 0L9 8.94 4.53 4.47a.75.75 0 10-1.06 1.06L7.94 10l-4.47 4.47a.75.75 0 101.06 1.06L9 11.06l4.47 4.47a.75.75 0 101.06-1.06L10.06 10l4.47-4.47a.75.75 0 000-1.06z" />
-              </svg>
-            </button>
+    <>
+      <Button className="m-5" onClick={handleGoBack} icon={RiRefreshLine}>
+        Volver
+      </Button>
+
+      <div className='flex justify-around flex-wrap'>
+        <div>
+          <CardPicadoComponent/>
+        </div>
+
+        <div className="mx-auto max-w-full mt-4">
+          {/* Mostrar el total de horas trabajadas */}
+          <div className="total-hours mt-4">
+            <h2 className="text-lg font-bold">Total de Horas Trabajadas: {totalHours} horas</h2>
           </div>
 
-          <div className="mb-4">
-            <input
-              type="text"
-              placeholder="Buscar por ID de Usuario"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="w-full p-2 border border-gray-300 rounded"
-            />
+          <div className="flex flex-col mb-4 space-y-4">
+            {/* Aquí puedes agregar filtros u otros inputs según sea necesario */}
           </div>
 
-          <div className="overflow-x-auto max-h-96">
-            <table className="table w-full">
+          <div className="overflow-x-auto">
+            <table className="table table-xs min-w-full">
               <thead>
                 <tr>
                   <th>Fecha</th>
-                  <th>Código</th>
-                  <th>User</th>
-                  <th>Machine</th>
-                  <th>Horómetro Inicial</th>
-                  <th>Horómetro Final</th>
-                  <th>Hora asignada</th>
+                  <th>Codigo</th>
+                  <th>Maquina</th>
+                  <th>Referencia</th>
+                  <th>H.Inicial</th>
+                  <th>H.Final</th>
+                  <th>H.Trabajadas</th>
                   <th>Observaciones</th>
-
+                  <th>H.Asignada</th>
+                  <th>Standar</th>
+                  <th>Meta/horas</th>
+                  <th>Eficiencia</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredRecords.length > 0 ? (
-                  filteredRecords.map((record) => (
-                    <tr key={record.id_registro}>
-                      <td>{record.registro_maquina}</td>
-                      <td>{record.id_usuarioRegistrador}</td>
-                      <td>{record.id_asignacion}</td>
-                      <td>{record.registro_referencia}</td>
-                      <td>{record.horometro_inicial}</td>
-                      <td>{record.horometro_final}</td>
-                      <td>{record.hora_asignadaRegistrador}</td>
-                      <td>{record.observaciones}</td>
-                    </tr>
-                  ))
+                {filteredData.length > 0 ? (
+                  filteredData.map((user, index) => {
+                    const initialHours = user.horometro_inicial || 0;
+                    const finalHours = user.horometro_final || 0;
+                    const hoursWorked = (finalHours - initialHours).toFixed(2); // Redondeado a 2 decimales
+                    const registroStand = user.registro_standard || 0;
+                    const horasAsignadas = user.hora_asignadaRegistrador || 0;
+                    const observaciones = user.observaciones || [];
+                    const registroStandDecimal = registroStand / 100;
+                    const efficiencyValue = (hoursWorked - (registroStandDecimal * horasAsignadas)).toFixed(2);
+
+                    return (
+                      <tr key={index}>
+                        <td>{formatDate(user.registro_maquina).toLocaleDateString()}</td>
+                        <td>{user.id_usuarioRegistrador}</td>
+                        <td>{user.id_asignacion}</td>
+                        <td>{user.registro_referencia}</td>
+                        <td>{initialHours}</td>
+                        <td>{finalHours}</td>
+                        <td>{hoursWorked}</td> {/* Redondeado a 2 decimales */}
+                        <td>{observaciones}</td>
+                        <td>{horasAsignadas}</td>
+                        <td>{registroStand}</td>
+                        <td>{meta} %</td>
+                        <td className={efficiencyValue < -0.1 ? 'text-red-500' : 'text-green-500'}>{efficiencyValue}</td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
-                    <td colSpan="8" className="text-center">No se encontraron registros</td>
+                    <td colSpan="12">No hay registros disponibles</td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
-
-          <div className="flex justify-end pt-2">
-            <button onClick={onClose} className="btn btn-secondary">Cerrar</button>
-          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
