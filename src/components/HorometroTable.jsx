@@ -14,7 +14,7 @@ const RegisterTable = () => {
     // Función para obtener los registros
     const fetchRegisters = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/horometro-all');
+        const response = await axios.get('http://192.168.0.19:3000/api/horometro-all');
         setRegisters(response.data);
       } catch (error) {
         console.error('Error al obtener los registros:', error);
