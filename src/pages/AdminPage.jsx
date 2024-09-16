@@ -1,3 +1,4 @@
+import ExportRecords from "../components/ExportRecords";
 import FormMachine from "../components/FormMachine";
 import FormReference from "../components/formReference";
 import FormUsers from "../components/FormUsers";
@@ -14,7 +15,9 @@ export default function AdminPage() {
   return (
     <>
       <Navbar />
-
+        <div>
+          <ExportRecords />
+        </div>
       <h2 className="flex justify-center text-center m-5 font-bold">Administrar aplicación</h2>
       <div className="flex flex-row flex-wrap justify-center">
       <MenuSelect />

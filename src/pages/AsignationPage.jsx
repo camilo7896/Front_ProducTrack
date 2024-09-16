@@ -3,6 +3,7 @@ import { useGlobalContext } from "../context/UserContext";
 import Navbar from '../components/Navbar';
 import CapacityPanel from '../components/CapacityPanel';
 import AssignationsTable from '../components/AssignationsTable ';
+import { Link } from 'react-router-dom';
 
 const AsignationPage = () => {
   const { data: machinesData, usersData, referencesData, setAssignament, capacity, setCapacity } = useGlobalContext();
@@ -49,7 +50,7 @@ const AsignationPage = () => {
     const newStandards = [...standards];
     newStandards[index] = selectedMachine ? selectedMachine.estandar || '' : '';
     setStandards(newStandards);
-    
+
     const newReferences = [...references];
     newReferences[index] = '';
     setReferences(newReferences);
@@ -83,7 +84,7 @@ const AsignationPage = () => {
       alert('Por favor seleccione un usuario');
       return;
     }
-  
+
     const asignaciones = machines.map((machine, machineIndex) => ({
       id_usuarioAsignado: selectedUser.id_usuarios,
       id_maquinaAsignada: machine,
@@ -91,23 +92,23 @@ const AsignationPage = () => {
       horas_asignadas: times[machineIndex] || null,
       id_standar: standards[machineIndex] || null
     })).filter(asignacion => asignacion.id_maquinaAsignada);
-  
+
     try {
-      const response = await fetch('http://192.168.0.19:3000/api/assignations/multiple', {
+      const response = await fetch('http://localhost:3000/api/assignations/multiple', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(asignaciones)
       });
-  
+
       if (!response.ok) {
         const errorText = await response.text(); // Obtener texto del error
         console.error('Error:', errorText);
         alert("Error al crear las asignaciones");
         return;
       }
-  
+
       const data = await response.json();
       console.log('Success:', data);
       alert("Asignaciones creadas exitosamente");
@@ -139,19 +140,26 @@ const AsignationPage = () => {
             />
             <button className="btn btn-primary ml-2" onClick={handleSearch}>Buscar</button>
           </div>
-  
+
+          
+               <Link to={'/horometrotable'}>
+                <button className="btn join-item m-2">Editar registro</button>
+              </Link>
+
           {selectedUser && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className='flex justify-center items-center flex-col'>
                 <h2 className="text-xl font-semibold">Usuario: {selectedUser.nombres} {selectedUser.apellidos}</h2>
                 <CapacityPanel />
               </div>
-  
+
+              
+
               <p className="font-semibold">Capacidad Total Seleccionada: {capacity}%</p>
               {machines.map((machine, machineIndex) => (
                 <div key={machineIndex} className="space-y-2">
                   <select
-                    className={`select select-bordered w-full max-w-xs ${machine ? 'bg-green-200' : 'bg-white'} m-5`}
+                    className={`select select-bordered w-full max-w-xs ${machine ? 'bg-green-200' : 'bg-white'} m-2`}
                     value={machine}
                     onChange={(e) => handleMachineChange(machineIndex, e.target.value)}
                   >
@@ -193,7 +201,7 @@ const AsignationPage = () => {
               <button type="submit" className="btn btn-primary">Asignar</button>
             </form>
           )}
-          <AssignationsTable/>
+          <AssignationsTable />
         </div>
       </div>
     </>

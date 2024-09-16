@@ -109,6 +109,7 @@ const AssignationsTable = () => {
   return (
     <>
       <div className="overflow-x-auto mt-40">
+      <h2 className='text-4xl p-2'>Tabla de asignaciones</h2>
         <table className="table table-xs table-pin-rows table-pin-cols text-center border border-gray-200 p-2">
           <thead>
             <tr>

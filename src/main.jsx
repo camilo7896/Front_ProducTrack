@@ -11,6 +11,7 @@ import EficencePage from './pages/EficencePage'
 import PrivateRoute from './PrivateRoute'
 import LoginPage from './pages/LoginPage'
 import UnauthorizedPage from './pages/UnauthorizedPage'
+import HorometroTable from './components/HorometroTable'
 
 const route = createBrowserRouter(
   [ {path: '/',
@@ -53,6 +54,10 @@ const route = createBrowserRouter(
     {
       path: '/unauthorized',
       element: <UnauthorizedPage/>
+    },
+    {
+      path: '/horometrotable',
+      element: <HorometroTable/>
     }
   ]
 )
