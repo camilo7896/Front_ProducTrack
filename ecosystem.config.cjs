@@ -1,14 +1,13 @@
-export default {
+module.exports = {
   apps: [
     {
-      name: 'my-react-app',
-      script: 'node_modules/.bin/vite',
-      args: 'dev',
+      name: "vite-app",
+      script: "npm",
+      args: "start", // Cambia esto si tu comando `start` es diferente
       env: {
-        PORT: 3001,
-      },
-      watch: true,
-      ignore_watch: ['node_modules', 'dist'],
-    },
-  ],
+        NODE_ENV: "production",
+        PORT: 3001 // Ajusta el puerto si es necesario
+      }
+    }
+  ]
 };
