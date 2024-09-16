@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGlobalContext } from "../context/UserContext";
-import { Card } from '@tremor/react';
 import { RiRefreshLine } from '@remixicon/react';
 import { Button } from '@tremor/react';
 import CardPicadoComponent from './CardPicadoComponent';
 
 export default function Eficences() {
-  const { allRegisterData, searchTermUser, setSearchTermUser, searchTermMachine, setSearchTermMachine, startDate, totalHours, setTotalHours, setStartDate, endDate, setEndDate, setTotalStandard, setEfficiency, setTotalEfficiency } = useGlobalContext();
+  const { allRegisterData, searchTermUser, setSearchTermUser, searchTermMachine, setSearchTermMachine, startDate,  setTotalHours, setStartDate, endDate, setEndDate, setTotalStandard, setEfficiency, setTotalEfficiency } = useGlobalContext();
 
   const [meta, setMeta] = useState(0);
 
