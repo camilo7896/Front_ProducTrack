@@ -94,7 +94,7 @@ const AsignationPage = () => {
     })).filter(asignacion => asignacion.id_maquinaAsignada);
 
     try {
-      const response = await fetch('http://localhost:3000/api/assignations/multiple', {
+      const response = await fetch('http://192.168.0.19:3000/api/assignations/multiple', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
