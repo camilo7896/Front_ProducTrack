@@ -23,50 +23,40 @@ const OperariosEficiencia = ({ allRegisterData }) => {
     );
   });
 
-  const calculateEfficiency = (data) => {
-    const efficiencyMap = {};
+  const calculateData = (data) => {
+    const dataMap = {};
 
     data.forEach(user => {
-      const initialHours = user.horometro_inicial || 0;
-      const finalHours = user.horometro_final || 0;
-      const hoursWorked = finalHours - initialHours;
+      const recordDate = parseDate(user.registro_maquina).toLocaleDateString(); // Parse date to a string
 
-      if (!efficiencyMap[user.id_usuarioRegistrador]) {
-        efficiencyMap[user.id_usuarioRegistrador] = {
-          totalHours: 0,
-          totalEfficiency: 0,
+      if (!dataMap[user.id_usuarioRegistrador]) {
+        dataMap[user.id_usuarioRegistrador] = {
           recordCount: 0,
+          uniqueDays: new Set(), // Store unique dates
         };
       }
 
-      const horasAsignadas = user.hora_asignadaRegistrador || 0;
-      const registroStandDecimal = (user.registro_standard || 0) / 100;
-      const efficiencyValue = (hoursWorked - (registroStandDecimal * horasAsignadas)).toFixed(2);
-
-      efficiencyMap[user.id_usuarioRegistrador].totalHours += hoursWorked;
-      efficiencyMap[user.id_usuarioRegistrador].totalEfficiency += parseFloat(efficiencyValue);
-      efficiencyMap[user.id_usuarioRegistrador].recordCount += 1;
+      dataMap[user.id_usuarioRegistrador].recordCount += 1;
+      dataMap[user.id_usuarioRegistrador].uniqueDays.add(recordDate); // Add the date to the set of unique days
     });
 
-    return Object.entries(efficiencyMap).map(([userId, { totalHours, totalEfficiency, recordCount }]) => ({
+    return Object.entries(dataMap).map(([userId, { recordCount, uniqueDays }]) => ({
       userId,
-      totalHours: totalHours.toFixed(2),
-      totalEfficiency: totalEfficiency.toFixed(2),
       recordCount,
-      averageEfficiency: recordCount > 0 ? (totalEfficiency / recordCount).toFixed(2) : 0,
-    })).sort((a, b) => b.recordCount - a.recordCount || b.averageEfficiency - a.averageEfficiency); // Sort by record count and efficiency
+      uniqueDaysCount: uniqueDays.size, // Count of unique days worked
+    })).sort((a, b) => b.recordCount - a.recordCount); // Sort by record count
   };
 
-  const efficiencyList = calculateEfficiency(filteredData);
+  const dataList = calculateData(filteredData);
 
   // Filter the list based on searchTermOperario
   const filteredList = searchTermOperario
-    ? efficiencyList.filter(operator => operator.userId === searchTermOperario)
-    : efficiencyList;
+    ? dataList.filter(operator => operator.userId === searchTermOperario)
+    : dataList;
 
   return (
     <aside className="w-1/4 p-6 bg-gradient-to-r from-blue-950 via-gray-400 to-black text-gray rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-6 text-center text-white">Ranking de Eficiencia de Operarios</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center text-white">Ranking de Operarios</h2>
       
       <div className="mb-6">
         <input
@@ -78,20 +68,22 @@ const OperariosEficiencia = ({ allRegisterData }) => {
         />
       </div>
 
-      <ul className="space-y-4">
-        {filteredList.length > 0 ? (
-          filteredList.map((operator, index) => (
-            <li key={operator.userId} className="p-4 bg-white text-black rounded-lg shadow-md">
-            <span className="font-extrabold text-cyan-800">Puesto {efficiencyList.findIndex(op => op.userId === operator.userId) + 1}:</span> <br />
-              Operario: <span className="font-bold text-cyan-800">{operator.userId}</span>, 
-              Registros: <span className="font-bold text-cyan-800">{operator.recordCount}</span>, <br />
-              Eficiencia Promedio: <span className={`font-bold ${operator.averageEfficiency < -0.1 ? 'text-red-500' : 'text-green-500'}`}>{operator.averageEfficiency}</span>
-            </li>
-          ))
-        ) : (
-          <li className="p-4 bg-white text-black rounded-lg shadow-md">No hay datos disponibles</li>
-        )}
-      </ul>
+      <div className="max-h-80 overflow-y-auto">
+        <ul className="space-y-4">
+          {filteredList.length > 0 ? (
+            filteredList.map((operator, index) => (
+              <li key={operator.userId} className="p-4 bg-white text-black rounded-lg shadow-md">
+                <span className="font-extrabold text-cyan-800">Puesto {dataList.findIndex(op => op.userId === operator.userId) + 1}:</span> <br />
+                Operario: <span className="font-bold text-cyan-800">{operator.userId}</span>, <br />
+                Registros: <span className="font-bold text-cyan-800">{operator.recordCount}</span>, <br />
+                Días Trabajados: <span className="font-bold text-cyan-800">{operator.uniqueDaysCount}</span>
+              </li>
+            ))
+          ) : (
+            <li className="p-4 bg-white text-black rounded-lg shadow-md">No hay datos disponibles</li>
+          )}
+        </ul>
+      </div>
     </aside>
   );
 };

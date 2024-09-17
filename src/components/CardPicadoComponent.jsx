@@ -6,7 +6,7 @@ export default function CardPicadoComponent() {
 
   return (
     <>
-    <div>
+    <div className='flex flex-wrap'>
 
           <Card className="mx-auto max-w-md">
             <p className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">Eficiencia picado</p>

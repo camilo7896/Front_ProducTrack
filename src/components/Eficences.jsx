@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGlobalContext } from "../context/UserContext";
 import { RiRefreshLine } from '@remixicon/react';
 import { Button } from '@tremor/react';
 import CardPicadoComponent from './CardPicadoComponent';
 import OperariosEficiencia from './OperariosEficiencia'; // Importa el componente
+import MachineHoursChart from './MachineHoursChart'; // Importa el nuevo componente de gráfico
 
 export default function Eficences() {
   const { allRegisterData, searchTermUser, setSearchTermUser, searchTermMachine, setSearchTermMachine, startDate, setStartDate, endDate, setEndDate, setTotalHours, setTotalStandard, setEfficiency, setTotalEfficiency } = useGlobalContext();
 
   const [meta, setMeta] = useState(0);
+  const [machineEfficiencyData, setMachineEfficiencyData] = useState([]);
 
   const navigate = useNavigate();
 
@@ -31,7 +33,7 @@ export default function Eficences() {
     const recordDate = parseDate(user.registro_maquina);
 
     const withinDateRange = (!startDate || parseDate(startDate) <= recordDate) &&
-                            (!endDate || recordDate <= parseDate(endDate));
+      (!endDate || recordDate <= parseDate(endDate));
 
     return (
       withinDateRange &&
@@ -47,6 +49,8 @@ export default function Eficences() {
     let totalStandard = 0;
     let totalEfficiency = 0;
 
+    const efficiencyMap = {};
+
     filteredData.forEach(user => {
       const initialHours = user.horometro_inicial || 0;
       const finalHours = user.horometro_final || 0;
@@ -61,7 +65,20 @@ export default function Eficences() {
       const registroStandDecimal = user.registro_standard / 100;
       const efficiencyValue = (hoursWorked - (registroStandDecimal * horasAsignadas)).toFixed(2);
       totalEfficiency += parseFloat(efficiencyValue);
+
+      if (!efficiencyMap[user.id_asignacion]) {
+        efficiencyMap[user.id_asignacion] = {
+          machineId: user.id_asignacion,
+          totalHoursWorked: 0,
+        };
+      }
+
+      efficiencyMap[user.id_asignacion].totalHoursWorked += hoursWorked;
     });
+
+    const machineEfficiencyList = Object.values(efficiencyMap);
+
+    setMachineEfficiencyData(machineEfficiencyList);
 
     const averageMeta = totalStandard > 0 ? ((totalStandard / filteredData.length) / 100).toFixed(2) : 0;
     setMeta(averageMeta);
@@ -80,8 +97,16 @@ export default function Eficences() {
         <Button className="m-5" onClick={handleGoBack} icon={RiRefreshLine}>Volver</Button>
 
         <div className='flex justify-around flex-wrap'>
+        <div className="flex space-x-4">
+
+          {/* Añade el componente MachineHoursChart aquí */}
+          <MachineHoursChart data={machineEfficiencyData} />
+          {/* Añade el componente OperariosEficiencia aquí */}
+          <OperariosEficiencia allRegisterData={allRegisterData} />
+          
+        </div>
           <div>
-            <CardPicadoComponent/>
+            <CardPicadoComponent />
           </div>
 
           <div className="mx-auto max-w-full mt-4">
@@ -183,10 +208,10 @@ export default function Eficences() {
             </div>
           </div>
         </div>
+
+
       </div>
 
-      {/* Añade el componente OperariosEficiencia aquí */}
-      <OperariosEficiencia allRegisterData={allRegisterData} />
     </div>
   );
 }
