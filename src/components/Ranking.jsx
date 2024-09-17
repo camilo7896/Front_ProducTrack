@@ -78,30 +78,44 @@ export default function Ranking() {
       const horasAsignadas = user.hora_asignadaRegistrador || 0;
       const registroStandDecimal = registroStand / 100;
       const efficiencyValue = (hoursWorked - (registroStandDecimal * horasAsignadas)).toFixed(2);
-
+  
       if (!acc[user.id_usuarioRegistrador]) {
-        acc[user.id_usuarioRegistrador] = { totalHours: 0, totalStandard: 0, totalEfficiency: 0, id_usuarioRegistrador: user.id_usuarioRegistrador };
+        acc[user.id_usuarioRegistrador] = {
+          totalHours: 0,
+          totalStandard: 0,
+          totalEfficiency: 0,
+          totalRecords: 0, // Añadir total de registros
+          id_usuarioRegistrador: user.id_usuarioRegistrador,
+        };
       }
-
+  
       acc[user.id_usuarioRegistrador].totalHours += hoursWorked;
       acc[user.id_usuarioRegistrador].totalStandard += registroStand;
       acc[user.id_usuarioRegistrador].totalEfficiency += parseFloat(efficiencyValue);
-
+      acc[user.id_usuarioRegistrador].totalRecords += 1; // Incrementar el conteo de registros
+  
       return acc;
     }, {});
-
+  
     const efficiencyData = Object.values(groupedData);
-
-    // Ordenar los datos por eficiencia total (más cercano a 0)
-    const sortedData = efficiencyData.sort((a, b) => Math.abs(a.totalEfficiency) - Math.abs(b.totalEfficiency));
+  
+    // Ordenar los datos por número de registros y eficiencia total
+    const sortedData = efficiencyData.sort((a, b) => {
+      if (b.totalRecords === a.totalRecords) {
+        return Math.abs(a.totalEfficiency) - Math.abs(b.totalEfficiency);
+      }
+      return b.totalRecords - a.totalRecords;
+    });
     setTopThree(sortedData.slice(0, 3));
-
+  
     // Calcular la eficiencia global
     const totalHours = efficiencyData.reduce((acc, item) => acc + item.totalHours, 0);
     const totalStandard = efficiencyData.reduce((acc, item) => acc + item.totalStandard, 0);
     const overallEfficiency = totalStandard > 0 ? (totalHours / (totalStandard / 100)) * 100 : 0;
     setEfficiency(overallEfficiency.toFixed(2));
   }, [filteredData, setEfficiency]);
+  
+  
 
   // Datos para la gráfica
   const chartData = {
@@ -171,21 +185,23 @@ export default function Ranking() {
         </div>
 
         <div className="flex justify-around flex-wrap mt-4">
-          {topThree.map((item, index) => (
-            <div key={item.id_usuarioRegistrador} className={`m-4 p-4 border rounded-lg ${index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-silver-200' : 'bg-bronze-200'} flex items-center space-x-4`}>
-              <img
-                src={index === 0 ? goldMedalImage : index === 1 ? silverMedalImage : bronzeMedalImage} // Imágenes de medallas
-                alt={`Medalla ${index + 1}`}
-                className="w-16 h-16 rounded-full p-2 border border-l-cyan-50"
-              />
-              <div>
-                <p className="font-bold">{index + 1}° Puesto</p>
-                <p>Codigo: {item.id_usuarioRegistrador}</p>
-                <p className='font-semibold'>Eficiencia: {item.totalEfficiency.toFixed(2)} %</p>
-              </div>
-            </div>
-          ))}
-        </div>
+  {topThree.map((item, index) => (
+    <div key={item.id_usuarioRegistrador} className={`m-4 p-4 border rounded-lg ${index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-silver-200' : 'bg-bronze-200'} flex items-center space-x-4`}>
+      <img
+        src={index === 0 ? goldMedalImage : index === 1 ? silverMedalImage : bronzeMedalImage} // Imágenes de medallas
+        alt={`Medalla ${index + 1}`}
+        className="w-16 h-16 rounded-full p-2 border border-l-cyan-50"
+      />
+      <div>
+        <p className="font-bold">{index + 1}° Puesto</p>
+        <p>Código: {item.id_usuarioRegistrador}</p>
+        <p className='font-semibold'>Eficiencia: {item.totalEfficiency.toFixed(2)} %</p>
+        <p>Número de registros: {item.totalRecords}</p> {/* Mostrar el número de registros */}
+      </div>
+    </div>
+  ))}
+</div>
+
         <div className='flex justify-center'>
           <div className="m-4 md:m-8 bg-white p-4 md:p-10 rounded-3xl w-full max-w-4xl">
             <h3 className="font-semibold text-lg text-center mb-4">Eficiencia de los Top 3</h3>
