@@ -13,6 +13,8 @@ const UpdateModal = ({ register, setSelectedRegister }) => {
     registro_standard: register.registro_standard,
   });
 
+  const [alert, setAlert] = useState({ visible: false, message: '', type: '' });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -20,6 +22,7 @@ const UpdateModal = ({ register, setSelectedRegister }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setAlert({ visible: false, message: '', type: '' }); // Reset alert before submission
 
     try {
       const response = await axios.patch(
@@ -27,9 +30,11 @@ const UpdateModal = ({ register, setSelectedRegister }) => {
         formData
       );
       console.log('Registro actualizado:', response.data);
+      setAlert({ visible: true, message: 'Registro actualizado exitosamente.', type: 'success' });
       setSelectedRegister(null); // Cierra el modal
     } catch (error) {
       console.error('Error al actualizar el registro:', error);
+      setAlert({ visible: true, message: 'Error al actualizar el registro.', type: 'error' });
     }
   };
 
@@ -68,7 +73,7 @@ const UpdateModal = ({ register, setSelectedRegister }) => {
               className="input input-bordered"
             />
           </div>
-               
+
           <div className="form-control mb-4">
             <label className="label">Hora Asignada</label>
             <input
@@ -79,24 +84,31 @@ const UpdateModal = ({ register, setSelectedRegister }) => {
               className="input input-bordered"
             />
           </div>
-          
-            <div className="modal-action">
-              <button type="submit" className="btn btn-success">
-                Guardar Cambios
-              </button>
-              <button
-                type="button"
-                className="btn btn-error"
-                onClick={() => setSelectedRegister(null)}
-              >
-                Cancelar
-              </button>
+
+          <div className="modal-action">
+            <button type="submit" className="btn btn-success">
+              Guardar Cambios
+            </button>
+            <button
+              type="button"
+              className="btn btn-error"
+              onClick={() => setSelectedRegister(null)}
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+
+        {alert.visible && (
+          <div className={`alert ${alert.type === 'success' ? 'alert-success' : 'alert-error'} mt-4`}>
+            <div>
+              <span>{alert.message}</span>
             </div>
-          </form>
-        </div>
+          </div>
+        )}
       </div>
-    );
-  };
+    </div>
+  );
+};
 
-  export default UpdateModal;
-
+export default UpdateModal;
