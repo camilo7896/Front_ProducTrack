@@ -15,7 +15,9 @@ const RegisterTable = () => {
     const fetchRegisters = async () => {
       try {
         const response = await axios.get('http://192.168.0.19:3000/api/horometro-all');
-        setRegisters(response.data);
+        // Ordenar los registros por fecha en orden descendente
+        const sortedRegisters = response.data.sort((a, b) => new Date(b.registro_maquina) - new Date(a.registro_maquina));
+        setRegisters(sortedRegisters);
       } catch (error) {
         console.error('Error al obtener los registros:', error);
       }
@@ -35,10 +37,10 @@ const RegisterTable = () => {
     setSelectedRegister(null); // Resetea el registro seleccionado
     setShowTable(true); // Muestra la tabla
   };
+
   const navigate = useNavigate();
 
   const handleGoBack = () => navigate(-1);
-
 
   return (
     <div className="container mx-auto p-6">
@@ -47,9 +49,6 @@ const RegisterTable = () => {
           <div className="mb-4">
             {/* Botón de Volver al inicio (si es necesario) */}
             <Button className="m-5" onClick={handleGoBack} icon={RiRefreshLine}>Volver</Button>
-
-
-            
           </div>
           <h1 className="text-2xl font-bold mb-4">Tabla de Registros</h1>
           <div className="overflow-x-auto">
