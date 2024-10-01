@@ -13,6 +13,7 @@ import LoginPage from './pages/LoginPage'
 import UnauthorizedPage from './pages/UnauthorizedPage'
 import HorometroTable from './components/HorometroTable'
 
+
 const route = createBrowserRouter(
   [ {path: '/',
     element: <LoginPage/>,
@@ -65,6 +66,7 @@ const route = createBrowserRouter(
 ReactDOM.createRoot(document.getElementById('root')).render(
 <UserContext>
   <RouterProvider router={route}/>
+
 </UserContext>
 
 )

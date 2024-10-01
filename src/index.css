@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Puedes agregar esto a tu archivo CSS si no existe */
+.bg-yellow-200 {
+    background-color: #fefcbf; /* Cambia esto al color que prefieras */
+  }
+  
