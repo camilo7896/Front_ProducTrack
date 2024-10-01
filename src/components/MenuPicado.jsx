@@ -18,7 +18,7 @@ export default function MenuPicado() {
     <>
       <div className="flex">
         <button className="btn join-item m-2">Registrar</button>
-        <button onClick={handleOpenModal} className="btn join-item m-2">Historial</button>
+        {/* <button onClick={handleOpenModal} className="btn join-item m-2">Historial</button> */}
         <Link to={'/eficences'}>
         <button className="btn join-item m-2">Eficiencia</button>
         </Link>

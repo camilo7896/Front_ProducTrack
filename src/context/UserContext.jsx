@@ -29,8 +29,8 @@ const UserContext = ({ children }) => {
   // ***********************************************************************************************
 
   //Ruta conexiones
+  //const rutaLocal = 'http://192.168.0.19:3000/api/';
   const rutaLocal = 'http://192.168.0.19:3000/api/';
-   // const rutaLocal = 'http://localhost:3000/api/';
 
 
   // Loggin *******************************************************************+
