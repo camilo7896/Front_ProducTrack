@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 const RegisterTable = () => {
   const [registers, setRegisters] = useState([]);
+  const [originalRegisters, setOriginalRegisters] = useState([]); // Para guardar el estado original
   const [selectedRegister, setSelectedRegister] = useState(null); // Para almacenar el registro a editar
   const [showTable, setShowTable] = useState(true); // Para manejar la visibilidad de la tabla
 
@@ -16,13 +17,14 @@ const RegisterTable = () => {
       try {
         const response = await axios.get('http://192.168.0.19:3000/api/horometro-all');
         setRegisters(response.data);
+        setOriginalRegisters(response.data); // Guardar una copia del estado original
       } catch (error) {
         console.error('Error al obtener los registros:', error);
       }
     };
 
     fetchRegisters();
-  }, [registers]);
+  }, []);
 
   // Función para abrir el formulario de actualización
   const handleUpdateClick = (register) => {
@@ -35,21 +37,28 @@ const RegisterTable = () => {
     setSelectedRegister(null); // Resetea el registro seleccionado
     setShowTable(true); // Muestra la tabla
   };
+
   const navigate = useNavigate();
 
   const handleGoBack = () => navigate(-1);
 
+  // Función para verificar si un campo ha sido modificado
+  const isModified = (register) => {
+    const original = originalRegisters.find((orig) => orig.id_registro === register.id_registro);
+    return original && (
+      register.horometro_inicial !== original.horometro_inicial ||
+      register.horometro_final !== original.horometro_final ||
+      register.observaciones !== original.observaciones ||
+      register.hora_asignadaRegistrador !== original.hora_asignadaRegistrador
+    );
+  };
 
   return (
     <div className="container mx-auto p-6">
       {showTable ? (
         <>
           <div className="mb-4">
-            {/* Botón de Volver al inicio (si es necesario) */}
             <Button className="m-5" onClick={handleGoBack} icon={RiRefreshLine}>Volver</Button>
-
-
-            
           </div>
           <h1 className="text-2xl font-bold mb-4">Tabla de Registros</h1>
           <div className="overflow-x-auto">
@@ -62,8 +71,8 @@ const RegisterTable = () => {
                   <th>Horómetro Inicial</th>
                   <th>Horómetro Final</th>
                   <th>Observaciones</th>
-                  <th>Acciones</th>
                   <th>Hora asignada</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -72,16 +81,34 @@ const RegisterTable = () => {
                     <td>{register.id_registro}</td>
                     <td>{register.registro_maquina}</td>
                     <td>{register.id_usuarioRegistrador}</td>
-                    <td>{register.horometro_inicial}</td>
-                    <td>{register.horometro_final}</td>
-                    <td>{register.observaciones}</td>
-                    <td>{register.hora_asignadaRegistrador}</td>
+
+                    <td
+                      className={isModified(register) ? 'bg-warning/20' : ''}
+                    >
+                      {register.horometro_inicial}
+                    </td>
+                    <td
+                      className={isModified(register) ? 'bg-warning/20' : ''}
+                    >
+                      {register.horometro_final}
+                    </td>
+                    <td
+                      className={isModified(register) ? 'bg-warning/20' : ''}
+                    >
+                      {register.observaciones}
+                    </td>
+                    <td
+                      className={isModified(register) ? 'bg-warning/20' : ''}
+                    >
+                      {register.hora_asignadaRegistrador}
+                    </td>
+
                     <td>
                       <button
-                        className="btn btn-primary mr-2"
+                        className={`btn mr-2 ${isModified(register) ? 'btn-error' : 'btn-primary'}`}
                         onClick={() => handleUpdateClick(register)}
                       >
-                        Actualizar
+                        {isModified(register) ? 'Editado' : 'Actualizar'}
                       </button>
                     </td>
                   </tr>
