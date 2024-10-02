@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 
 const UpdateModal = ({ register, setSelectedRegister }) => {
@@ -6,12 +6,23 @@ const UpdateModal = ({ register, setSelectedRegister }) => {
     horometro_inicial: register.horometro_inicial,
     horometro_final: register.horometro_final,
     observaciones: register.observaciones,
-    registro_maquina: register.registro_maquina,
+    registro_maquina: new Date(register.registro_maquina).toISOString().slice(0, 16), // Formato para 'datetime-local'
     id_usuarioRegistrador: register.id_usuarioRegistrador,
     hora_asignadaRegistrador: register.hora_asignadaRegistrador,
     registro_referencia: register.registro_referencia,
     registro_standard: register.registro_standard,
   });
+
+  const originalValues = {
+    horometro_inicial: register.horometro_inicial,
+    horometro_final: register.horometro_final,
+    observaciones: register.observaciones,
+    registro_maquina: new Date(register.registro_maquina).toISOString().slice(0, 16),
+    id_usuarioRegistrador: register.id_usuarioRegistrador,
+    hora_asignadaRegistrador: register.hora_asignadaRegistrador,
+    registro_referencia: register.registro_referencia,
+    registro_standard: register.registro_standard,
+  };
 
   const [alert, setAlert] = useState({ visible: false, message: '', type: '' });
 
@@ -22,12 +33,17 @@ const UpdateModal = ({ register, setSelectedRegister }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setAlert({ visible: false, message: '', type: '' }); // Reset alert before submission
+    setAlert({ visible: false, message: '', type: '' });
 
     try {
+      const updatedData = {
+        ...formData,
+        registro_maquina: new Date(formData.registro_maquina).toISOString(),
+      };
+
       const response = await axios.patch(
         `http://192.168.0.19:3000/api/horometro-all/${register.id_registro}`,
-        formData
+        updatedData
       );
       console.log('Registro actualizado:', response.data);
       setAlert({ visible: true, message: 'Registro actualizado exitosamente.', type: 'success' });
@@ -38,11 +54,27 @@ const UpdateModal = ({ register, setSelectedRegister }) => {
     }
   };
 
+  const isModified = (field) => {
+    return formData[field] !== originalValues[field];
+  };
+
   return (
     <div className="modal modal-open">
       <div className="modal-box">
         <h2 className="font-bold text-lg mb-4">Actualizar Registro</h2>
         <form onSubmit={handleSubmit}>
+          {/* Campo de Fecha y Hora */}
+          <div className="form-control mb-4">
+            <label className="label">Fecha y Hora</label>
+            <input
+              type="datetime-local"
+              name="registro_maquina"
+              value={formData.registro_maquina}
+              onChange={handleChange}
+              className={`input input-bordered ${isModified('registro_maquina') ? 'border-warning bg-warning/20' : ''}`}
+            />
+          </div>
+
           <div className="form-control mb-4">
             <label className="label">Horómetro Inicial</label>
             <input
@@ -50,9 +82,10 @@ const UpdateModal = ({ register, setSelectedRegister }) => {
               name="horometro_inicial"
               value={formData.horometro_inicial}
               onChange={handleChange}
-              className="input input-bordered"
+              className={`input input-bordered ${isModified('horometro_inicial') ? 'border-warning bg-warning/20' : ''}`}
             />
           </div>
+
           <div className="form-control mb-4">
             <label className="label">Horómetro Final</label>
             <input
@@ -60,9 +93,10 @@ const UpdateModal = ({ register, setSelectedRegister }) => {
               name="horometro_final"
               value={formData.horometro_final}
               onChange={handleChange}
-              className="input input-bordered"
+              className={`input input-bordered ${isModified('horometro_final') ? 'border-warning bg-warning/20' : ''}`}
             />
           </div>
+
           <div className="form-control mb-4">
             <label className="label">Observaciones</label>
             <input
@@ -70,7 +104,7 @@ const UpdateModal = ({ register, setSelectedRegister }) => {
               name="observaciones"
               value={formData.observaciones}
               onChange={handleChange}
-              className="input input-bordered"
+              className={`input input-bordered ${isModified('observaciones') ? 'border-warning bg-warning/20' : ''}`}
             />
           </div>
 
@@ -81,21 +115,13 @@ const UpdateModal = ({ register, setSelectedRegister }) => {
               name="hora_asignadaRegistrador"
               value={formData.hora_asignadaRegistrador}
               onChange={handleChange}
-              className="input input-bordered"
+              className={`input input-bordered ${isModified('hora_asignadaRegistrador') ? 'border-warning bg-warning/20' : ''}`}
             />
           </div>
 
           <div className="modal-action">
-            <button type="submit" className="btn btn-success">
-              Guardar Cambios
-            </button>
-            <button
-              type="button"
-              className="btn btn-error"
-              onClick={() => setSelectedRegister(null)}
-            >
-              Cancelar
-            </button>
+            <button type="submit" className="btn btn-success">Guardar Cambios</button>
+            <button type="button" className="btn btn-error" onClick={() => setSelectedRegister(null)}>Cancelar</button>
           </div>
         </form>
 
