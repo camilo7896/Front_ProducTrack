@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import UpdateModal from './UpdateModal';
+import DataForm from './DataForm'; // Importa el nuevo componente
 import { Button } from '@tremor/react';
 import { RiRefreshLine } from '@remixicon/react';
 import { useNavigate } from 'react-router-dom';
@@ -10,9 +11,9 @@ const RegisterTable = () => {
   const [originalRegisters, setOriginalRegisters] = useState([]); // Para guardar el estado original
   const [selectedRegister, setSelectedRegister] = useState(null); // Para almacenar el registro a editar
   const [showTable, setShowTable] = useState(true); // Para manejar la visibilidad de la tabla
+  const [showForm, setShowForm] = useState(false); // Para manejar la visibilidad del formulario
 
   useEffect(() => {
-    // Función para obtener los registros
     const fetchRegisters = async () => {
       try {
         const response = await axios.get('http://192.168.0.19:3000/api/horometro-all');
@@ -26,23 +27,20 @@ const RegisterTable = () => {
     fetchRegisters();
   }, []);
 
-  // Función para abrir el formulario de actualización
   const handleUpdateClick = (register) => {
-    setSelectedRegister(register); // Guarda el registro que se quiere actualizar
-    setShowTable(false); // Oculta la tabla
+    setSelectedRegister(register);
+    setShowTable(false);
   };
 
-  // Función para cerrar el modal y volver a la tabla
   const handleCloseModal = () => {
-    setSelectedRegister(null); // Resetea el registro seleccionado
-    setShowTable(true); // Muestra la tabla
+    setSelectedRegister(null);
+    setShowTable(true);
   };
 
   const navigate = useNavigate();
 
   const handleGoBack = () => navigate(-1);
 
-  // Función para verificar si un campo ha sido modificado
   const isModified = (register) => {
     const original = originalRegisters.find((orig) => orig.id_registro === register.id_registro);
     return original && (
@@ -53,13 +51,28 @@ const RegisterTable = () => {
     );
   };
 
+  // Función para refrescar los registros después de enviar datos
+  const refreshRegisters = async () => {
+    try {
+      const response = await axios.get('http://192.168.0.19:3000/api/horometro-all');
+      setRegisters(response.data);
+      setOriginalRegisters(response.data); // Actualiza la copia del estado original
+    } catch (error) {
+      console.error('Error al obtener los registros:', error);
+    }
+  };
+
   return (
     <div className="container mx-auto p-6">
       {showTable ? (
         <>
           <div className="mb-4">
             <Button className="m-5" onClick={handleGoBack} icon={RiRefreshLine}>Volver</Button>
+            <Button className="m-5" onClick={() => setShowForm(!showForm)}>
+              {showForm ? 'Ocultar Formulario' : 'Agregar Registro'}
+            </Button>
           </div>
+          {showForm && <DataForm onSubmit={refreshRegisters} />} {/* Agregar el formulario */}
           <h1 className="text-2xl font-bold mb-4">Tabla de Registros</h1>
           <div className="overflow-x-auto">
             <table className="table w-full">
@@ -82,24 +95,16 @@ const RegisterTable = () => {
                     <td>{register.registro_maquina}</td>
                     <td>{register.id_usuarioRegistrador}</td>
 
-                    <td
-                      className={isModified(register) ? 'bg-warning/20' : ''}
-                    >
+                    <td className={isModified(register) ? 'bg-warning/20' : ''}>
                       {register.horometro_inicial}
                     </td>
-                    <td
-                      className={isModified(register) ? 'bg-warning/20' : ''}
-                    >
+                    <td className={isModified(register) ? 'bg-warning/20' : ''}>
                       {register.horometro_final}
                     </td>
-                    <td
-                      className={isModified(register) ? 'bg-warning/20' : ''}
-                    >
+                    <td className={isModified(register) ? 'bg-warning/20' : ''}>
                       {register.observaciones}
                     </td>
-                    <td
-                      className={isModified(register) ? 'bg-warning/20' : ''}
-                    >
+                    <td className={isModified(register) ? 'bg-warning/20' : ''}>
                       {register.hora_asignadaRegistrador}
                     </td>
 
