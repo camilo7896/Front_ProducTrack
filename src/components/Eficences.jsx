@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGlobalContext } from "../context/UserContext";
 import { RiRefreshLine } from '@remixicon/react';
@@ -9,7 +9,6 @@ import MachineHoursChart from './MachineHoursChart'; // Importa el nuevo compone
 
 export default function Eficences() {
   const { allRegisterData, searchTermUser, setSearchTermUser, searchTermMachine, setSearchTermMachine, startDate, setStartDate, endDate, setEndDate, setTotalHours, setTotalStandard, setEfficiency, setTotalEfficiency } = useGlobalContext();
-
   const [meta, setMeta] = useState(0);
   const [machineEfficiencyData, setMachineEfficiencyData] = useState([]);
 
@@ -27,6 +26,7 @@ export default function Eficences() {
   const parseDate = (dateStr) => new Date(dateStr);
 
   const filteredData = allRegisterData.filter(user => {
+   
     if (!user) return false;
     const searchLowerUser = searchTermUser.toLowerCase();
     const searchLowerMachine = searchTermMachine.toLowerCase();
@@ -90,7 +90,6 @@ export default function Eficences() {
     setEfficiency(efficiencyValue.toFixed(2));
 
   }, [filteredData]);
-
   return (
     <div className="flex">
       <div className="flex-1">
@@ -155,6 +154,7 @@ export default function Eficences() {
               <table className="table table-xs min-w-full">
                 <thead>
                   <tr>
+                  <th>Id</th>
                     <th>Fecha</th>
                     <th>Codigo</th>
                     <th>Maquina</th>
@@ -183,6 +183,7 @@ export default function Eficences() {
 
                       return (
                         <tr key={index}>
+                        <td>{user.id_registro}</td>
                           <td>{parseDate(user.registro_maquina).toLocaleDateString()}</td>
                           <td>{user.id_usuarioRegistrador}</td>
                           <td>{user.id_asignacion}</td>
