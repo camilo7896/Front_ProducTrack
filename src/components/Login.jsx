@@ -36,7 +36,7 @@ export default function Login() {
       <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md m-20">
         <div>
           <div className="flex justify-center items-center">
-            <img className="h-32 w-auto object-cover" src="public/logo-productrak.svg" alt="Workflow" />
+            <img className="h-32 w-auto object-cover" src="/logo-productrak.svg" alt="Workflow" />
           </div>
 
 
@@ -52,7 +52,7 @@ export default function Login() {
               placeholder="Ingrese su nombre de usuario"
               onChange={(e) => { setUsername(e.target.value) }}
               required
-              autoComplete="off"
+              autoComplete="on"
             />
           </div>
 

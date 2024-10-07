@@ -12,6 +12,8 @@ const handleLogout = () => {
   // Redirige a la página de login
   window.location.href = '/';
 };
+
+
   return (
     <div className="navbar bg-neutral text-white">
       <div className="navbar-center">
@@ -36,14 +38,15 @@ const handleLogout = () => {
             <li><Link to={'/'}>Home</Link></li>
            
             <li><Link to={'/picado'}>
-              <Cog8ToothIcon className="h-6 w-6 text-blue-500 m-2" />
-              Operario</Link></li>
+              <Cog8ToothIcon className="h-6 w-6 text-blue-500 m-4" />
+              Picado</Link></li>
+
 
             {/* <li><Link to={'/empaque'}>Empaque</Link></li> */}
             {role !== 'enrolador' && (
               <li>
                 <Link to={'/admin'}>
-                  <CogIcon className="h-6 w-6 text-blue-500 m-2" />
+                  <CogIcon className="h-6 w-6 text-blue-500 m-4" />
                   Administrador
                 </Link>
               </li>
@@ -51,8 +54,8 @@ const handleLogout = () => {
             )}
             {role !== 'enrolador' && (
               <li><Link to={'/asignation'}>
-                <UserGroupIcon className="h-6 w-6 text-blue-500 m-2 " />
-                Supervisor</Link></li>
+                <UserGroupIcon className="h-6 w-6 text-blue-500 m-4 " />
+                Asignaciones</Link></li>
             )}
             
             <li><button onClick={handleLogout} className="btn btn-primary m-2">Salir</button></li>
@@ -60,7 +63,7 @@ const handleLogout = () => {
         </div>
       </div>
       <div className="navbar-center">
-        <Link to={"/home"} className="btn btn-ghost text-xl">ProductTrack - F-1315</Link>
+        <Link to={"/home"} className="btn btn-ghost text-xl">ProductTrack</Link>
       </div>
       <div className="navbar-end"></div>
     </div>
