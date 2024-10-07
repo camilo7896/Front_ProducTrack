@@ -12,6 +12,7 @@ const RegisterTable = () => {
   const [selectedRegister, setSelectedRegister] = useState(null); // Para almacenar el registro a editar
   const [showTable, setShowTable] = useState(true); // Para manejar la visibilidad de la tabla
   const [showForm, setShowForm] = useState(false); // Para manejar la visibilidad del formulario
+  const [searchTerm, setSearchTerm] = useState(''); // Estado para almacenar el término de búsqueda
 
   useEffect(() => {
     const fetchRegisters = async () => {
@@ -62,24 +63,56 @@ const RegisterTable = () => {
     }
   };
 
+  // Función para manejar el cambio en el campo de búsqueda
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  // Filtrar los registros en función del término de búsqueda
+  const filteredRegisters = registers.filter((register) =>
+    register.id_registro.toString().includes(searchTerm) ||
+    register.registro_maquina.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    register.id_usuarioRegistrador.toString().includes(searchTerm)
+  );
+
   return (
     <div className="container mx-auto p-6">
       {showTable ? (
         <>
-          <div className="mb-4">
-            <Button className="m-5" onClick={handleGoBack} icon={RiRefreshLine}>Volver</Button>
-            <Button className="m-5" onClick={() => setShowForm(!showForm)}>
-              {showForm ? 'Ocultar Formulario' : 'Agregar Registro'}
-            </Button>
+          <div className="mb-4 flex justify-between">
+            <div>
+              <Button className="m-5" onClick={handleGoBack} icon={RiRefreshLine}>Volver</Button>
+              <Button className="m-5" onClick={() => setShowForm(!showForm)}>
+                {showForm ? 'Ocultar Formulario' : 'Agregar Registro'}
+              </Button>
+            </div>
+
+            {/* Agregar campo de búsqueda */}
+            <div className="flex items-center">
+              <label htmlFor="search" className="mr-2">Buscar:</label>
+              <input
+                id="search"
+                type="text"
+                className="input input-bordered"
+                placeholder="Buscar por ID, Fecha, Operario..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </div>
           </div>
+
           {showForm && <DataForm onSubmit={refreshRegisters} />} {/* Agregar el formulario */}
-          <h1 className="text-2xl font-bold mb-4">Tabla de Registros</h1>
+          
+          {/* Mostrar el número total de registros */}
+          <h1 className="text-2xl font-bold mb-4">Tabla de Registros (Total: {filteredRegisters.length})</h1>
+          
           <div className="overflow-x-auto">
             <table className="table w-full">
               <thead>
                 <tr>
                   <th>ID</th>
-                  <td>Fecha</td>
+                  <th>Fecha</th>
+                  <th>Maquina</th>
                   <th>Operario</th>
                   <th>Horómetro Inicial</th>
                   <th>Horómetro Final</th>
@@ -89,10 +122,12 @@ const RegisterTable = () => {
                 </tr>
               </thead>
               <tbody>
-                {registers.map((register) => (
+                {filteredRegisters.map((register) => (
                   <tr key={register.id_registro}>
                     <td>{register.id_registro}</td>
                     <td>{register.registro_maquina}</td>
+                    <td>{register.id_asignacion}</td>
+
                     <td>{register.id_usuarioRegistrador}</td>
 
                     <td className={isModified(register) ? 'bg-warning/20' : ''}>
